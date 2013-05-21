@@ -1,0 +1,13 @@
+<appian-plugin name="ZipUtilities" key="ziputilities">
+
+  <plugin-info>
+    <description>ZipUtilities</description>
+    <vendor name="Appian Corporation" url="http://www.appian.com" />
+    <version>1.0.0</version>
+    <application-version min="6.1.0" />
+  </plugin-info>
+
+
+  <smart-service name="UnpackZIP" key="UnpackZIP"
+    class="archant.appian.com.Unzip" />
+</appian-plugin>
