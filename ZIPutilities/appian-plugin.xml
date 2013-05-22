@@ -7,7 +7,16 @@
     <application-version min="6.1.0" />
   </plugin-info>
 
-
   <smart-service name="UnpackZIP" key="UnpackZIP"
     class="archant.appian.com.Unzip" />
+
+  <smart-service name="Zip" key="Zip"
+    class="archant.appian.com.Zip" />
+
+  <smart-service name="Delete Local Directory" key="DeleteLocalDirectory"
+    class="archant.appian.com.deleteDIR" />
+
+  <smart-service name="Move File on Disk" key="MoveFileonDisk"
+    class="archant.appian.com.MoveFile" />
+    
 </appian-plugin>

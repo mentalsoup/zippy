@@ -12,10 +12,10 @@
 	<classpathentry kind="lib" path="lib-compile/appian-suite.jar"/>
 	<classpathentry kind="lib" path="lib-compile/appian-suiteapi.jar"/>
 	<classpathentry kind="lib" path="lib-compile/appian-type.jar"/>
-	<classpathentry kind="lib" path="lib-compile/commons-collections-3.2.jar"/>
 	<classpathentry kind="lib" path="lib-compile/jaxb-api-2.1.jar"/>
 	<classpathentry kind="lib" path="lib-compile/jaxb-impl-2.1.13.jar"/>
 	<classpathentry kind="lib" path="lib-compile/jaxb-xjc-2.1.13.jar"/>
 	<classpathentry kind="lib" path="lib-compile/log4j-1.2.15.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
