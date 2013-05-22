@@ -12,11 +12,5 @@
 
   <smart-service name="Zip" key="Zip"
     class="archant.appian.com.Zip" />
-
-  <smart-service name="Delete Local Directory" key="DeleteLocalDirectory"
-    class="archant.appian.com.deleteDIR" />
-
-  <smart-service name="Move File on Disk" key="MoveFileonDisk"
-    class="archant.appian.com.MoveFile" />
     
 </appian-plugin>
