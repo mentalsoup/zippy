@@ -42,7 +42,7 @@ public class Zip extends AppianSmartService {
 	@Override
 	public void run() throws SmartServiceException {
 		try {
-			zip(source, destination+"/"+name);
+			zip(source, destination+name);
 		} catch (Exception e) {
 		// TODO Auto-generated method stub
 		e.printStackTrace();}

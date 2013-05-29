@@ -5,12 +5,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.log4j.Logger;
 
 import com.appiancorp.suiteapi.common.Name;
+import com.appiancorp.suiteapi.knowledge.Document;
 import com.appiancorp.suiteapi.process.exceptions.SmartServiceException;
 import com.appiancorp.suiteapi.process.framework.AppianSmartService;
 import com.appiancorp.suiteapi.process.framework.Input;
@@ -36,7 +39,7 @@ public class Unzip extends AppianSmartService {
 		// TODO Auto-generated method stub
 		e.printStackTrace();}
 	}
-
+	
 	/**
 	 * This utility extracts files and directories of a standard zip file to
 	 * a destination directory.
@@ -63,15 +66,16 @@ public class Unzip extends AppianSmartService {
 	        ZipEntry entry = zipIn.getNextEntry();
 	        // iterates over entries in the zip file
 	        while (entry != null) {
-	            String filePath = targetOutputPath + File.separator + entry.getName();
-	            if (!entry.isDirectory()) {
+	        	String filePath = targetOutputPath + "\\" + entry.getName();
+	            if (!entry.getName().contains("/")) {
 	                // if the entry is a file, extracts it
 	                extractFile(zipIn, filePath);
 	            } else {
-	                // if the entry is a directory, make the directory
-	                File dir = new File(filePath);
-	                dir.mkdir();
+	                // if the entry is a directory, make the directory	            	
+	                File dir = new File(filePath.substring(0,filePath.lastIndexOf("/")));
+	                extractFile(zipIn, filePath);
 	            }
+	            
 	            zipIn.closeEntry();
 	            entry = zipIn.getNextEntry();
 	        }
@@ -84,7 +88,7 @@ public class Unzip extends AppianSmartService {
 	     * @throws IOException
 	     */
 	    private void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
-	        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
+	    	OutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(filePath)));
 	        byte[] bytesIn = new byte[BUFFER_SIZE];
 	        int read = 0;
 	        while ((read = zipIn.read(bytesIn)) != -1) {
