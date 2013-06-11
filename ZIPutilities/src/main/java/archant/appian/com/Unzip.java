@@ -1,14 +1,12 @@
 package archant.appian.com;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 
 import org.apache.log4j.Logger;
 
@@ -26,6 +24,8 @@ import com.appiancorp.suiteapi.process.palette.PaletteInfo;
 @PaletteInfo(paletteCategory = "Integration Services", palette = "FileSystem Services") 
 public class Unzip extends AppianSmartService {
 
+	private final static int BUFFER_SIZE = 2048;
+	private final static String ZIP_EXTENSION = ".zip";
 	private static final Logger LOG = Logger.getLogger(Unzip.class);
 	private final SmartServiceContext smartServiceCtx;
 	private String fileToUnzip;
@@ -39,63 +39,67 @@ public class Unzip extends AppianSmartService {
 		// TODO Auto-generated method stub
 		e.printStackTrace();}
 	}
-	
-	/**
-	 * This utility extracts files and directories of a standard zip file to
-	 * a destination directory.
-	 * @author www.codejava.net
-	 *
-	 */
-	    /**
-	     * Size of the buffer to read/write data
-	     */
-	    private static final int BUFFER_SIZE = 4096;
-	    /**
-	     * Extracts a zip file specified by the zipFilePath to a directory specified by
-	     * destDirectory (will be created if does not exists)
-	     * @param fileToUnzip
-	     * @param targetOutputPath
-	     * @throws IOException
-	     */
-	    public void unzip(String fileToUnzip, String targetOutputPath) throws IOException {
-	        File destDir = new File(targetOutputPath);
-	        if (!destDir.exists()) {
-	            destDir.mkdir();
-	        }
-	        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(fileToUnzip));
-	        ZipEntry entry = zipIn.getNextEntry();
-	        // iterates over entries in the zip file
-	        while (entry != null) {
-	        	String filePath = targetOutputPath + "\\" + entry.getName();
-	            if (!entry.getName().contains("/")) {
-	                // if the entry is a file, extracts it
-	                extractFile(zipIn, filePath);
-	            } else {
-	                // if the entry is a directory, make the directory	            	
-	                File dir = new File(filePath.substring(0,filePath.lastIndexOf("/")));
-	                extractFile(zipIn, filePath);
-	            }
-	            
-	            zipIn.closeEntry();
-	            entry = zipIn.getNextEntry();
-	        }
-	        zipIn.close();
+	 
+	 public static boolean unzip(String fileToUnzip2, String targetOutputPath2) {
+	  try {
+	   BufferedInputStream bufIS = null;
+	   // create the destination directory structure (if needed)
+	   File destDirectory = new File(targetOutputPath2);
+	   destDirectory.mkdirs();
+	 
+	   // open archive for reading
+	   File file = new File(fileToUnzip2);
+	   ZipFile zipFile = new ZipFile(file, ZipFile.OPEN_READ);
+	 
+	   //for every zip archive entry do
+	   Enumeration<? extends ZipEntry> zipFileEntries = zipFile.entries();
+	   while (zipFileEntries.hasMoreElements()) {
+	    ZipEntry entry = (ZipEntry) zipFileEntries.nextElement();
+	    System.out.println("\tExtracting entry: " + entry);
+	 
+	    //create destination file
+	    File destFile = new File(destDirectory, entry.getName());
+	 
+	    //create parent directories if needed
+	    File parentDestFile = destFile.getParentFile();    
+	    parentDestFile.mkdirs();    
+	     
+	    if (!entry.isDirectory()) {
+	     bufIS = new BufferedInputStream(
+	       zipFile.getInputStream(entry));
+	     int currentByte;
+	 
+	     // buffer for writing file
+	     byte data[] = new byte[BUFFER_SIZE];
+	 
+	     // write the current file to disk
+	     FileOutputStream fOS = new FileOutputStream(destFile);
+	     BufferedOutputStream bufOS = new BufferedOutputStream(fOS, BUFFER_SIZE);
+	 
+	     while ((currentByte = bufIS.read(data, 0, BUFFER_SIZE)) != -1) {
+	      bufOS.write(data, 0, currentByte);
+	     }
+	 
+	     // close BufferedOutputStream
+	     bufOS.flush();
+	     bufOS.close();
+	 
+	     // recursively unzip files
+	     if (entry.getName().toLowerCase().endsWith(ZIP_EXTENSION)) {
+	      String zipFilePath = destDirectory.getPath() + File.separatorChar + entry.getName();
+	 
+	      unzip(zipFilePath, zipFilePath.substring(0, 
+	              zipFilePath.length() - ZIP_EXTENSION.length()));
+	     }
 	    }
-	    /**
-	     * Extracts a zip entry (file entry)
-	     * @param zipIn
-	     * @param filePath
-	     * @throws IOException
-	     */
-	    private void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
-	    	OutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(filePath)));
-	        byte[] bytesIn = new byte[BUFFER_SIZE];
-	        int read = 0;
-	        while ((read = zipIn.read(bytesIn)) != -1) {
-	            bos.write(bytesIn, 0, read);
-	        }
-	        bos.close();
-	    }
+	   }
+	   bufIS.close();
+	   return true;
+	  } catch (Exception e) {
+	   e.printStackTrace();
+	   return false;
+	  }
+	 } 
 	
 	
 	public Unzip(SmartServiceContext smartServiceCtx) {
